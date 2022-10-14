@@ -1,8 +1,6 @@
 # Comms ML
 Simulates wireless devices (all demos use 802.11ac) to generate realistic network traces and *their underlying wireless signals* for machine learning applications.
 
-**NOTE**: Documentation coming soon! Below is a quick summary.  
-
 ## Installation
 Required software:  
 * `python3` and packages*:  
@@ -37,7 +35,9 @@ The rest of the simulation options (*including output directories*) are defined 
 The simulator will:
 1. Prompt you to continue if any files would be overwritten
 2. Write PCAP files for the duration of the simulation (e.g., to `./out/pcaps`)
-3. Write features from the simulation (including generating physical signals using MATLAB if requested by configuration files)
+3. Write features from the simulation (including generating physical signals using MATLAB if requested by configuration files), e.g., `samples.npy`
 
 The output `.pcap` files may be analyzed in standard tools such as Wireshark
 The output `.npy` samples can be loaded in python using `numpy.load('samples.npy', allow_pickle=True)`
+
+Each `samples.npy` file is collected from a single run of the feature collector (generating features from a set of pcap files). If samples are to be acquired from multiple locations, the feature collector must be run again with a different `sampling_config.json`.
