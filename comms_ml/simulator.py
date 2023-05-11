@@ -199,6 +199,9 @@ def get_features(status_changes, n_tx, timescale_s=0.1, n_channels=None, tx_map=
 
 
 def plot_samples(exp_dir="./data"):
+    """
+    Plots the samples that are present in the given experiment directory
+    """
     for exp_name in sorted(next(os.walk(exp_dir))[2]):
         if exp_name.startswith("exp"):
             filename = os.path.join(exp_dir, exp_name)

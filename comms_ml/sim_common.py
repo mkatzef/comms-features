@@ -1,3 +1,7 @@
+"""
+Commonly used constants in comms_ml simulations
+"""
+
 seconds_per_hour = 60 * 60
 seconds_per_day = 24 * seconds_per_hour
 seconds_per_week = 7 * seconds_per_day

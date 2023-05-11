@@ -24,7 +24,7 @@ class Transmitter:
     def __init__(self, config, traffic_descs, sim_time_s=None, rate_Bps=1e6, message_cache=None):
         self.config = config
 
-        # TODO: add support for multiple traffics
+        # TODO: add support for multiple traffics per node
         if len(traffic_descs) > 1:
             print("NOTE: only first traffic for each node will be used")
         elif len(traffic_descs) == 0:
@@ -58,6 +58,9 @@ class Transmitter:
         return self.is_active
 
     def plot(self):
+        """
+        Plots the current node as a circle on an existing matplotlib diagram
+        """
         pos = self.config['pos'][:2]
         s = plt.scatter(*pos)
         color = s.get_facecolors()[0]
@@ -81,12 +84,15 @@ class Transmitter:
         return end_time
 
     def end(self, sim_time):
-        """ Returns next start time. """
+        """ Returns next start time """
         self.is_active = False
         self.prepare_next_message(sim_time)
         return self.tx_start_time
 
     def prepare_next_message(self, sim_time):
+        """
+        Stages the next message to be sent
+        """
         tx_start_time, msg_len_bits = self.traffic_source.prepare_next_message(sim_time)
         self.tx_start_time = tx_start_time
         self.tx_duration = msg_len_bits / self.rate_Bps

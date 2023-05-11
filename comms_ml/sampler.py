@@ -15,13 +15,13 @@ import os
 from scapy.all import wrpcap
 
 MATLAB = None  # MATLAB engine only populated if waveform generation is required
-HW_ADDR_MAP = {}
+HW_ADDR_MAP = {}  # Connects hardware addresses with simulated nodes
 
 
 class PcapRecorder:
     """
     Writes packets to disk in PCAP format every time a certain number of packets
-    have been given to an instance of PcapRecorder.
+    have been given to an instance.
     """
     def __init__(self, out_dir, n_store):
         self.n_store = n_store
@@ -30,11 +30,19 @@ class PcapRecorder:
         self.seqno = 0
 
     def append(self, pkt):
+        """
+        Records the given packet and saves the collection if a sufficient size
+        has been reached.
+        """
         self.packets.append(pkt)
         if len(self.packets) >= self.n_store:
             self.save_and_reset()
 
     def save_and_reset(self):
+        """
+        Writes the current collection of packets to a file and reset the internal
+        collection of packets staged for write.
+        """
         outfile = self.name_template % self.seqno
         wrpcap(outfile, self.packets)
 
@@ -43,6 +51,9 @@ class PcapRecorder:
 
 
 def get_pkt_property(record, property_name):
+    """
+    Extracts the requested property (given by name) from the given packet
+    """
     if property_name == "~pkt":
         return record[0]
     elif property_name == "~phy":
@@ -64,6 +75,13 @@ class FeatureCollector:
         self.property_map = property_map
 
     def __call__(self, records, ret=None):
+        """
+        Allows FeatureCollector objects to act as functions that work as
+            self(records, ret=None)
+        This function signature has been structured so that ret is the current
+        list of features that have been collected. Nested calls (e.g. self(self(*args)))
+        simply extract one feature per level of nesting - appending this to ret.
+        """
         if ret is None:
             ret = []
 
@@ -101,6 +119,10 @@ class SampleCollector:
 
 
 def packets_to_records(packets, use_phy):
+    """
+    Uses the underlying MATLAB simulation to generate the full record (packet + waveform)
+    for a given packet.
+    """
     records = []
     for i, pkt in enumerate(packets):
         if use_phy:
@@ -111,7 +133,11 @@ def packets_to_records(packets, use_phy):
     return records
 
 
-def get_node_tx_record(node):
+def get_node_tx_definition(node):
+    """
+    Generates full set of transmitter properties based on suitable defaults
+    which get overwritten if a corresponding key is present in the given node
+    """
     args = {
         'ChannelBandwidth': 'CBW160', # 160 MHz channel bandwidth
         'NumTransmitAntennas': 1.0,   # 1 transmit antenna
@@ -145,7 +171,7 @@ def init_waveform_gen(seed, nodes):
     MATLAB.rng(seed)
 
     for node in nodes:
-        HW_ADDR_MAP.update(get_node_tx_record(node))  # Record node details mapping traffic to Tx properties
+        HW_ADDR_MAP.update(get_node_tx_definition(node))  # Record node details mapping traffic to Tx properties
 
 
 def generate_waveform(pkt):

@@ -64,6 +64,11 @@ def get_day_second_from_time(sim_time):
 
 
 def get_hp_params(day_index, second, weekends=0.5):
+    """
+    Returns example Hawkes process parameters based on the day and time of day.
+    Note, all weekdays are assumed to have the same average level of comms,
+    both weekend days are assumed to have their own level (which is by default half)
+    """
     day_mults = [1, 1, 1, 1, 1, weekends, weekends]  # Mon-Sun
     day_mult = day_mults[day_index]
     intensity = 0.001 + 0.02 + 0.02 * day_mult * (1 + np.sin((2 / seconds_per_day * second - 1) * np.pi))
@@ -167,11 +172,11 @@ def get_traffic_model(
     arg_bursty_intra=(0.01, 0.07),
     arg_bursty_inter=(0.1, 60),
     arg_hawkes=0.05,
-    weekend_mult=0.5):
-
+    weekend_mult=0.5
+    ):
     """
     A convenience function that takes the traffic model name as a required
-    argument and populates any missing argument with defaults.
+    argument and populates any missing arguments with defaults.
     """
 
     if traffic_type == "bursty":
@@ -197,6 +202,6 @@ def get_traffic_model(
             weekend_mult=weekend_mult
         )
     else:
-        raise NameError("Unrecognized traffic type")
+        raise NameError("Unrecognized traffic type: " + str(traffic_type))
 
     return new_traffic

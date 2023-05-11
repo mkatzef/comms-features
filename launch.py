@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 """
-launch.py - launch a wireless network simulation and collect feature vectors,
+launch.py - launch comms_ml; a wireless network simulation and collect feature vectors,
 all as specified through configuration files.
-
 """
 import argparse
 import json
@@ -14,19 +13,20 @@ import comms_ml.simulator
 
 
 if __name__ == "__main__":
+    # Parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("sim_config", type=str, help="set sim config (JSON) path")
     parser.add_argument("sampling_config", type=str, help="set sampling config (JSON) path")
     parser.add_argument("--silent", help="silence runtime messages", action="store_true")
-
     args = parser.parse_args()
 
+    # Set logging properties
     log_level = logging.INFO
     if args.silent:
         log_level = logging.WARN
-
     logging.basicConfig(stream=sys.stdout, level=log_level)
 
+    # Collect config names
     sim_config_file = args.sim_config
     sampling_config_file = args.sampling_config
 
